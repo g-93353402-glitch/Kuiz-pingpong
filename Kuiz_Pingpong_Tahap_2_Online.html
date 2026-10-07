@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuiz Sukan Pingpong – Tahap 2</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#e8f5e9,#e3f2fd);color:#17324d}
+.container{max-width:720px;margin:30px auto;padding:18px}
+.card{background:#fff;border-radius:22px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+h1{text-align:center;margin:0 0 6px;font-size:28px}
+.subtitle{text-align:center;color:#607d8b;margin-bottom:25px}
+.ball{text-align:center;font-size:52px}
+label{font-weight:bold;display:block;margin:14px 0 7px}
+input{width:100%;padding:13px;border:1px solid #b0bec5;border-radius:10px;font-size:16px}
+button{border:0;border-radius:12px;padding:13px 20px;font-size:16px;font-weight:bold;cursor:pointer}
+.primary{width:100%;margin-top:22px;background:#1976d2;color:#fff}
+.primary:hover{background:#1565c0}
+.question{padding:18px 0;border-bottom:1px solid #e0e0e0}
+.question:last-child{border-bottom:0}
+.qtext{font-weight:bold;font-size:17px;line-height:1.45;margin-bottom:12px}
+.option{display:block;margin:8px 0;padding:12px;border:1px solid #cfd8dc;border-radius:10px;cursor:pointer}
+.option:hover{background:#f5f5f5}
+.option input{width:auto;margin-right:9px}
+.hidden{display:none}
+.result{text-align:center}
+.score{font-size:54px;font-weight:bold;margin:12px 0}
+.good{font-size:18px;margin:8px}
+.small{font-size:13px;color:#78909c;text-align:center;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card" id="start">
+  <div class="ball">🏓</div>
+  <h1>Kuiz Sukan Pingpong</h1>
+  <div class="subtitle">Betul / Salah • Tahap 2</div>
+  <label for="name">Nama Murid</label>
+  <input id="name" type="text" placeholder="Masukkan nama">
+  <label for="class">Kelas</label>
+  <input id="class" type="text" placeholder="Contoh: 4 USM">
+  <button class="primary" onclick="startQuiz()">MULA KUIZ</button>
+  <div class="small">10 soalan • 10 markah</div>
+</div>
+
+<div class="card hidden" id="quiz">
+  <div style="display:flex;justify-content:space-between;font-weight:bold;margin-bottom:10px">
+    <span>🏓 Kuiz Pingpong</span><span id="progress">1/10</span>
+  </div>
+  <div id="questions"></div>
+  <button class="primary" onclick="submitQuiz()">HANTAR JAWAPAN</button>
+</div>
+
+<div class="card hidden result" id="result">
+  <div class="ball">🎉</div>
+  <h1>Kuiz Selesai!</h1>
+  <p id="student"></p>
+  <div class="score" id="score"></div>
+  <div class="good" id="details"></div>
+  <button class="primary" onclick="location.reload()">CUBA LAGI</button>
+</div>
+</div>
+
+<script>
+const quiz = [
+["Bola pingpong biasanya berwarna putih atau oren.","BETUL"],
+["Pemain menggunakan bet untuk memukul bola pingpong.","BETUL"],
+["Bola pingpong boleh dipukul menggunakan tangan tanpa bet semasa permainan.","SALAH"],
+["Jaring membahagikan meja pingpong kepada dua bahagian.","BETUL"],
+["Dalam permainan pingpong, bola perlu melantun di atas meja sebelum dipukul oleh pemain lawan.","BETUL"],
+["Pemain boleh memegang bola pingpong dan membalingnya terus ke kawasan lawan untuk mendapatkan mata.","SALAH"],
+["Pemain perlu melakukan servis untuk memulakan permainan.","BETUL"],
+["Meja pingpong berbentuk segi empat tepat.","BETUL"],
+["Dalam permainan perseorangan, dua orang pemain bermain antara satu sama lain.","BETUL"],
+["Pemain boleh menyentuh jaring dengan sengaja ketika permainan berlangsung tanpa sebarang kesalahan.","SALAH"]
+];
+
+function startQuiz(){
+  const name=document.getElementById("name").value.trim();
+  const cls=document.getElementById("class").value.trim();
+  if(!name||!cls){alert("Sila isi Nama Murid dan Kelas dahulu.");return;}
+  let html="";
+  quiz.forEach((item,i)=>{
+    html+=`<div class="question"><div class="qtext">${i+1}. ${item[0]}</div>
+    <label class="option"><input type="radio" name="q${i}" value="BETUL"> BETUL</label>
+    <label class="option"><input type="radio" name="q${i}" value="SALAH"> SALAH</label></div>`;
+  });
+  document.getElementById("questions").innerHTML=html;
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+function submitQuiz(){
+  let score=0, answered=0;
+  quiz.forEach((item,i)=>{
+    const selected=document.querySelector(`input[name="q${i}"]:checked`);
+    if(selected){answered++; if(selected.value===item[1])score++;}
+  });
+  if(answered<quiz.length){
+    alert(`Sila jawab semua soalan dahulu. Anda baru menjawab ${answered}/10.`);
+    return;
+  }
+  const name=document.getElementById("name").value;
+  const cls=document.getElementById("class").value;
+  document.getElementById("student").textContent=`${name} • ${cls}`;
+  document.getElementById("score").textContent=`${score} / 10`;
+  document.getElementById("details").textContent=
+    score===10?"🏆 Cemerlang! Semua jawapan betul!":
+    score>=8?"👏 Bagus! Teruskan usaha!":
+    score>=5?"👍 Baik! Cuba ulang kaji lagi.":
+    "💪 Jangan putus asa. Cuba lagi!";
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
